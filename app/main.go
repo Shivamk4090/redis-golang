@@ -24,9 +24,10 @@ func main() {
 	// multiple connection
 	for {
 		conn, err := l.Accept()
+
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
+			continue
 		}
 		go handleClient(conn)
 
@@ -34,13 +35,15 @@ func main() {
 }
 
 func handleClient(conn net.Conn) {
+	defer conn.Close()
+
 	// multiple command in 1 connection
 	for {
 		buffer := make([]byte, 1024)
 		_, err := conn.Read(buffer)
 		if err != nil {
-			fmt.Println("Error reading from connection")
-			os.Exit(1)
+			fmt.Println("Error reading from connection || conection closed")
+			return
 		}
 		conn.Write([]byte("+PONG\r\n"))
 	}
