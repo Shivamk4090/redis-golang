@@ -21,11 +21,20 @@ func main() {
 	}
 	defer l.Close()
 
-	conn, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
+	// multiple connection
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+		go handleClient(conn)
+
 	}
+}
+
+func handleClient(conn net.Conn) {
+	// multiple command in 1 connection
 	for {
 		buffer := make([]byte, 1024)
 		_, err := conn.Read(buffer)
